@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bill Result</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<div class="container">
+    <h2>Bill Generated Successfully</h2>
+
+    <div class="summary">
+        <p><strong>Customer:</strong> {{ bill.customer.email }}</p>
+        <p><strong>Total Amount:</strong> ₹ {{ bill.total_amount }}</p>
+        <p><strong>Paid Amount:</strong> ₹ {{ bill.paid_amount }}</p>
+        <p><strong>Balance:</strong> ₹ {{ bill.balance_amount }}</p>
+    </div>
+
+    <h3>Change Denominations</h3>
+    <table>
+        <tr>
+            <th>Denomination</th>
+            <th>Count</th>
+        </tr>
+        {% for key, value in change.items %}
+        <tr>
+            <td>₹ {{ key }}</td>
+            <td>{{ value }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <a href="{% url 'billing_page' %}" class="btn back-btn">Create Another Bill</a>
+</div>
+
+</body>
+</html>

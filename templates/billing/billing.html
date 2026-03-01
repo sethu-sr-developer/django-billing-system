@@ -1,0 +1,122 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Billing System</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<div class="container">
+
+    <h2>Billing System</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="error-message">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" action="{% url 'generate_bill' %}">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label>Customer Email</label>
+            <input type="email" name="email" required>
+        </div>
+
+        <div class="product-section">
+            <h3>Products</h3>
+
+            <div class="product-row">
+                <div>
+                    <label>Product ID</label>
+                    <input type="text" id="product_id" name="product_id" required>
+                </div>
+
+                <div>
+                    <label>Quantity</label>
+                    <input type="number" id="quantity" name="quantity" min="1" required>
+                </div>
+
+                <div>
+                    <label>Item Total</label>
+                    <input type="text" id="item_total" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group total-display">
+            <label>Total Bill Amount</label>
+            <input type="text" id="final_total" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Paid Amount</label>
+            <input type="number" name="paid_amount" required>
+        </div>
+
+        <button type="submit" class="btn">Generate Bill</button>
+
+    </form>
+
+</div>
+
+<script>
+
+let unitPrice = 0;
+let taxPercentage = 0;
+
+const productInput = document.getElementById("product_id");
+const quantityInput = document.getElementById("quantity");
+const itemTotalInput = document.getElementById("item_total");
+const finalTotalInput = document.getElementById("final_total");
+
+// Fetch product details
+productInput.addEventListener("blur", function() {
+
+    const productId = productInput.value;
+
+    fetch(`/get-product/?product_id=${productId}`)
+        .then(response => response.json())
+        .then(data => {
+
+            if(data.success) {
+                unitPrice = parseFloat(data.unit_price);
+                taxPercentage = parseFloat(data.tax_percentage);
+                calculateTotal();
+            } else {
+                alert("Invalid Product ID");
+            }
+
+        });
+
+});
+
+// Calculate total when quantity changes
+quantityInput.addEventListener("input", calculateTotal);
+
+function calculateTotal() {
+
+    const quantity = parseInt(quantityInput.value);
+
+    if(!quantity || !unitPrice) {
+        itemTotalInput.value = "";
+        finalTotalInput.value = "";
+        return;
+    }
+
+    const subtotal = unitPrice * quantity;
+    const tax = subtotal * (taxPercentage / 100);
+    const total = subtotal + tax;
+
+    itemTotalInput.value = total.toFixed(2);
+    finalTotalInput.value = total.toFixed(2);
+}
+
+</script>
+
+</body>
+</html>

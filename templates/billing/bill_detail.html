@@ -1,0 +1,22 @@
+{% load static %}
+<h2 class="page-title">Bill #{{ bill.id }}</h2>
+
+<p><strong>Customer:</strong> {{ bill.customer.email }}</p>
+
+<table class="table">
+    <tr>
+        <th>Product</th>
+        <th>Qty</th>
+        <th>Total</th>
+    </tr>
+
+    {% for item in bill.items.all %}
+    <tr>
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>₹ {{ item.total_price }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="{% url 'customer_purchases' %}" class="btn back-btn">Back</a>

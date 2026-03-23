@@ -88,3 +88,83 @@ input:focus {
     background-color: #f0f8ff;
     font-weight: bold;
 }
+
+.denomination-section {
+    margin-top: 10px;
+}
+
+.denomination-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.denomination-row label {
+    width: 80px;
+    font-weight: 600;
+}
+
+.denomination-row input {
+    width: 120px;
+}
+
+
+/* Page Title */
+.page-title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Table Styling */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.table th {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    text-align: left;
+}
+
+.table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.table tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Action Link (View button) */
+.action-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.action-link:hover {
+    text-decoration: underline;
+}
+
+/* Search Form */
+.search-box {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.search-box input {
+    width: 300px;
+}
+
+/* Back Button */
+.back-btn {
+    display: inline-block;
+    margin-top: 20px;
+    text-align: center;
+}

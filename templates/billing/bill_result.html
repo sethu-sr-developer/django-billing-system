@@ -8,8 +8,10 @@
 <body>
 
 <div class="container">
+
     <h2>Bill Generated Successfully</h2>
 
+    <!-- Summary -->
     <div class="summary">
         <p><strong>Customer:</strong> {{ bill.customer.email }}</p>
         <p><strong>Total Amount:</strong> ₹ {{ bill.total_amount }}</p>
@@ -17,7 +19,32 @@
         <p><strong>Balance:</strong> ₹ {{ bill.balance_amount }}</p>
     </div>
 
+    <!-- Item Breakdown -->
+    <h3>Items</h3>
+    <table>
+        <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+            <th>Tax</th>
+            <th>Total</th>
+        </tr>
+
+        {% for item in bill.items.all %}
+        <tr>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.price_without_tax }}</td>
+            <td>{{ item.tax_amount }}</td>
+            <td>{{ item.total_price }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <!-- Denomination -->
     <h3>Change Denominations</h3>
+
+    {% if change %}
     <table>
         <tr>
             <th>Denomination</th>
@@ -30,8 +57,12 @@
         </tr>
         {% endfor %}
     </table>
+    {% else %}
+        <p>No change to return</p>
+    {% endif %}
 
     <a href="{% url 'billing_page' %}" class="btn back-btn">Create Another Bill</a>
+
 </div>
 
 </body>

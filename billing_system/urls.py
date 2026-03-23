@@ -17,11 +17,14 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from billing.views import billing_page, generate_bill, get_product_details
+from billing.views import billing_page, generate_bill, get_product_details, customer_purchases, bill_detail
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', billing_page, name="billing_page"),
     path('generate/', generate_bill, name="generate_bill"),
     path('get-product/', get_product_details, name='get_product_details'),
+    path('purchases/', customer_purchases, name='customer_purchases'),
+    path('bill/<int:bill_id>/', bill_detail, name='bill_detail'),
 ]

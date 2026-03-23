@@ -16,7 +16,7 @@ def calculate_change(balance_amount):
             result[denom.value] = int(usable)
             balance_amount -= denom.value * usable
 
-    # if balance_amount > 0:
-    #     raise Exception("Insufficient denomination available")
+    if balance_amount > 0:
+        raise Exception("Insufficient denomination available")
 
     return result

@@ -3,6 +3,11 @@
 <html>
 <head>
     <title>Billing System</title>
+    <div style="text-align: right; margin-bottom: 15px;">
+        <a href="{% url 'customer_purchases' %}" class="btn" style="width:auto; padding:8px 15px;">
+            View Previous Purchases
+        </a>
+    </div>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
@@ -22,37 +27,86 @@
     <form method="POST" action="{% url 'generate_bill' %}">
         {% csrf_token %}
 
+        <!-- Customer Email -->
         <div class="form-group">
             <label>Customer Email</label>
             <input type="email" name="email" required>
         </div>
 
+        <!-- Products Section -->
         <div class="product-section">
             <h3>Products</h3>
 
-            <div class="product-row">
-                <div>
-                    <label>Product ID</label>
-                    <input type="text" id="product_id" name="product_id" required>
-                </div>
-
-                <div>
-                    <label>Quantity</label>
-                    <input type="number" id="quantity" name="quantity" min="1" required>
-                </div>
-
-                <div>
-                    <label>Item Total</label>
-                    <input type="text" id="item_total" readonly>
+            <div id="products-container">
+                <div class="product-row">
+                    <input type="text" name="product_id" placeholder="Product ID" required onblur="fetchProductDetails(this)">
+                    <input type="text" class="product_name" placeholder="Product Name" readonly>
+                    <input type="number" name="quantity" placeholder="Quantity" min="1" required>
+                    <input type="text" class="item_total" placeholder="Item Total" readonly>
                 </div>
             </div>
+
+            <button type="button" class="btn" onclick="addRow()">Add Product</button>
         </div>
 
+        <!-- Total -->
         <div class="form-group total-display">
-            <label>Total Bill Amount</label>
+            <label>Total Bill Amount (Preview)</label>
             <input type="text" id="final_total" readonly>
         </div>
 
+        <!-- Denominations -->
+        <h3>Denominations</h3>
+        <div class="denomination-section">
+            
+            <div class="denomination-row">
+                <label>₹500</label>
+                <input type="number" name="denom_500" placeholder="Count" value="0">
+            </div>
+
+            <div class="denomination-row">
+                <label>₹200</label>
+                <input type="number" name="denom_200" placeholder="Count" value="0">
+            </div>
+
+            <div class="denomination-row">
+                <label>₹100</label>
+                <input type="number" name="denom_100" placeholder="Count" value="0">
+            </div>
+
+            <div class="denomination-row">
+                <label>₹50</label>
+                <input type="number" name="denom_50" placeholder="Count" value="0">
+            </div>
+
+            <div class="denomination-row">
+                <label>₹20</label>
+                <input type="number" name="denom_20" placeholder="Count" value="0">
+            </div>
+
+            <div class="denomination-row">
+                <label>₹10</label>
+                <input type="number" name="denom_10" placeholder="Count" value="0">
+            </div>
+
+            <div class="denomination-row">
+                <label>₹5</label>
+                <input type="number" name="denom_5" placeholder="Count" value="0">
+            </div>
+
+            <div class="denomination-row">
+                <label>₹2</label>
+                <input type="number" name="denom_2" placeholder="Count" value="0">
+            </div>
+
+            <div class="denomination-row">
+                <label>₹1</label>
+                <input type="number" name="denom_1" placeholder="Count" value="0">
+            </div>
+
+        </div>
+
+        <!-- Paid Amount -->
         <div class="form-group">
             <label>Paid Amount</label>
             <input type="number" name="paid_amount" required>
@@ -66,54 +120,95 @@
 
 <script>
 
-let unitPrice = 0;
-let taxPercentage = 0;
+function fetchProductDetails(input) {
 
-const productInput = document.getElementById("product_id");
-const quantityInput = document.getElementById("quantity");
-const itemTotalInput = document.getElementById("item_total");
-const finalTotalInput = document.getElementById("final_total");
-
-// Fetch product details
-productInput.addEventListener("blur", function() {
-
-    const productId = productInput.value;
+    const row = input.parentElement;
+    const productId = input.value;
 
     fetch(`/get-product/?product_id=${productId}`)
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
 
-            if(data.success) {
-                unitPrice = parseFloat(data.unit_price);
-                taxPercentage = parseFloat(data.tax_percentage);
-                calculateTotal();
+            if (data.success) {
+
+                row.dataset.price = data.unit_price;
+                row.dataset.tax = data.tax_percentage;
+
+                row.querySelector(".product_name").value = data.name;
+
+                calculateRowTotal(row);
+                calculateFinalTotal();
+
             } else {
                 alert("Invalid Product ID");
             }
 
         });
+}
 
-});
 
-// Calculate total when quantity changes
-quantityInput.addEventListener("input", calculateTotal);
+function calculateRowTotal(row) {
 
-function calculateTotal() {
+    const qtyInput = row.querySelector('input[name="quantity"]');
+    const totalInput = row.querySelector(".item_total");
 
-    const quantity = parseInt(quantityInput.value);
+    const qty = parseInt(qtyInput.value);
+    const price = parseFloat(row.dataset.price || 0);
+    const tax = parseFloat(row.dataset.tax || 0);
 
-    if(!quantity || !unitPrice) {
-        itemTotalInput.value = "";
-        finalTotalInput.value = "";
+    if (!qty || !price) {
+        totalInput.value = "";
         return;
     }
 
-    const subtotal = unitPrice * quantity;
-    const tax = subtotal * (taxPercentage / 100);
-    const total = subtotal + tax;
+    const subtotal = price * qty;
+    const taxAmount = subtotal * (tax / 100);
+    const total = subtotal + taxAmount;
 
-    itemTotalInput.value = total.toFixed(2);
-    finalTotalInput.value = total.toFixed(2);
+    totalInput.value = total.toFixed(2);
+}
+
+
+function calculateFinalTotal() {
+
+    let finalTotal = 0;
+
+    document.querySelectorAll(".item_total").forEach(input => {
+        const val = parseFloat(input.value);
+        if (!isNaN(val)) {
+            finalTotal += val;
+        }
+    });
+
+    document.getElementById("final_total").value = finalTotal.toFixed(2);
+}
+
+
+// Listen for quantity changes
+document.addEventListener("input", function(e) {
+    if (e.target.name === "quantity") {
+        const row = e.target.closest(".product-row");
+        calculateRowTotal(row);
+        calculateFinalTotal();
+    }
+});
+
+
+// Add new row
+function addRow() {
+    const container = document.getElementById("products-container");
+
+    const row = document.createElement("div");
+    row.classList.add("product-row");
+
+    row.innerHTML = `
+        <input type="text" name="product_id" placeholder="Product ID" required onblur="fetchProductDetails(this)">
+        <input type="text" class="product_name" placeholder="Product Name" readonly>
+        <input type="number" name="quantity" placeholder="Quantity" min="1" required>
+        <input type="text" class="item_total" placeholder="Item Total" readonly>
+    `;
+
+    container.appendChild(row);
 }
 
 </script>

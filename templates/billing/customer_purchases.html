@@ -1,0 +1,44 @@
+{% load static %}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Previous Purchases</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<div class="container">
+
+
+<h2 class="page-title">Previous Purchases - {{ email }}</h2>
+
+<table class="table">
+    <tr>
+        <th>Bill ID</th>
+        <th>Date</th>
+        <th>Total</th>
+        <th>Action</th>
+    </tr>
+
+    {% for bill in bills %}
+    <tr>
+        <td>{{ bill.id }}</td>
+        <td>{{ bill.created_at }}</td>
+        <td>₹ {{ bill.total_amount }}</td>
+        <td>
+            <a href="{% url 'bill_detail' bill.id %}" class="action-link">View</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="{% url 'billing_page' %}" class="btn back-btn">Back</a>
+
+</div>
+
+</body>
+</html>
+
+
